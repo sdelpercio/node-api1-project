@@ -6,6 +6,7 @@ server.use(express.json());
 
 const users = [];
 
+//  Create a New User
 server.post('/api/users', (req, res) => {
 	const newUser = req.body;
 
@@ -24,6 +25,7 @@ server.post('/api/users', (req, res) => {
 	}
 });
 
+// Get All Users
 server.get('/api/users', (req, res) => {
 	if (!users) {
 		return res
@@ -31,6 +33,25 @@ server.get('/api/users', (req, res) => {
 			.json({ errorMessage: 'The users information could not be retrieved.' });
 	} else {
 		return res.status(200).json(users);
+	}
+});
+
+// Get a Specific User
+server.get('/api/users/:userID', (req, res) => {
+	if (!req.params.userID) {
+		return res
+			.status(400)
+			.json({ errorMessage: 'Please include the users ID in the path' });
+	} else {
+		const userID = req.params.userID;
+		const filteredUsers = users.filter(item => item.id === userID);
+		if (filteredUsers.length === 0) {
+			return res
+				.status(404)
+				.json({ errorMessage: 'The user with the specific ID does not exist' });
+		} else {
+			return res.status(200).json(filteredUsers[0]);
+		}
 	}
 });
 
