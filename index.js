@@ -80,6 +80,39 @@ server.delete('/api/users/:userID', (req, res) => {
 	}
 });
 
+server.patch('/api/users/:userID', (req, res) => {
+	if (!req.params.userID) {
+		return res
+			.status(400)
+			.json({ errorMessage: 'Please include the users ID in the path' });
+	} else if (!req.body || !req.body.name || !req.body.bio) {
+		return res
+			.status(400)
+			.json({
+				errorMessage: 'Please include an object with the users name and bio'
+			});
+	} else {
+		const userID = req.params.userID;
+		const userInfo = req.body;
+		const foundUser = users.find(item => item.id === userID);
+		if (foundUser === undefined) {
+			return res
+				.status(404)
+				.json({ errorMessage: 'The user with the specific ID does not exist' });
+		} else {
+			users = users.map(item => {
+				if (item.id === userID) {
+					return userInfo;
+				} else {
+					return item;
+				}
+			});
+
+			return res.status(200).json(userInfo);
+		}
+	}
+});
+
 const PORT = 5000;
 server.listen(PORT, () =>
 	console.log(`\n ** listening on PORT: ${PORT} ** \n`)
