@@ -4,7 +4,11 @@ const shortid = require('shortid');
 const server = express();
 server.use(express.json());
 
-const users = [];
+let users = [];
+
+server.get('/', (req, res) => {
+	return res.status(418).send("I'm a teapot");
+});
 
 //  Create a New User
 server.post('/api/users', (req, res) => {
@@ -51,6 +55,27 @@ server.get('/api/users/:userID', (req, res) => {
 				.json({ errorMessage: 'The user with the specific ID does not exist' });
 		} else {
 			return res.status(200).json(filteredUsers[0]);
+		}
+	}
+});
+
+// Delete a User
+server.delete('/api/users/:userID', (req, res) => {
+	if (!req.params.userID) {
+		return res
+			.status(400)
+			.json({ errorMessage: 'Please include the users ID in the path' });
+	} else {
+		const userID = req.params.userID;
+		const foundUser = users.find(item => item.id === userID);
+		if (foundUser === undefined) {
+			return res
+				.status(404)
+				.json({ errorMessage: 'The user with the specific ID does not exist' });
+		} else {
+			users = users.filter(item => item.id !== userID);
+
+			return res.status(200).json(foundUser);
 		}
 	}
 });
